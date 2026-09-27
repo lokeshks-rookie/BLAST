@@ -1,0 +1,6 @@
+{
+  "status": "aborted_user_rejected",
+  "message": "Explicit confirmation was denied or not provided.",
+  "verified": false,
+  "patch_applied": false
+}
