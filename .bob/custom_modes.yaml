@@ -1,2 +1,88 @@
-# Blast Radius custom mode — placeholder for Phase 2
-# This file will be fully authored in Phase 2.
+# Blast Radius — Custom Mode Definition
+# IBM Bob 2.0 Custom Mode for dependency/manifest risk review
+
+slug: blast-radius
+name: Blast Radius
+description: >
+  Evidence-grounded dependency and configuration risk reviewer.
+  Triggers on diffs touching dependency or configuration manifests,
+  dispatches five specialized subagents in parallel, and produces a
+  single risk-tiered, evidence-backed verdict per change.
+
+# Trigger conditions — activates when a diff touches any of these file patterns
+trigger:
+  file_patterns:
+    # Package managers
+    - "package.json"
+    - "package-lock.json"
+    - "yarn.lock"
+    - "pnpm-lock.yaml"
+    - "requirements.txt"
+    - "Pipfile"
+    - "Pipfile.lock"
+    - "pyproject.toml"
+    - "poetry.lock"
+    - "go.mod"
+    - "go.sum"
+    - "Cargo.toml"
+    - "Cargo.lock"
+    - "Gemfile"
+    - "Gemfile.lock"
+    - "composer.json"
+    - "composer.lock"
+    # Container
+    - "Dockerfile"
+    - "Dockerfile.*"
+    - "docker-compose.yml"
+    - "docker-compose.yaml"
+    # CI/CD pipeline configs
+    - ".github/workflows/*.yml"
+    - ".github/workflows/*.yaml"
+    - ".gitlab-ci.yml"
+    - "Jenkinsfile"
+    - ".circleci/config.yml"
+    - "azure-pipelines.yml"
+    - ".travis.yml"
+
+# Skills referenced by this mode — one per subagent
+skills:
+  - path: skills/version-diff
+    name: Version-Diff Subagent
+  - path: skills/vuln-lookup
+    name: Vulnerability Lookup Subagent
+  - path: skills/usage-impact
+    name: Usage-Impact Subagent
+  - path: skills/fix-verify
+    name: Fix-Verify Subagent
+  - path: skills/risk-rank
+    name: Risk-Ranking Subagent
+
+# Rules directory for orchestration logic
+rules:
+  - path: rules-blast-radius
+
+# Execution sequence
+orchestration:
+  sequence:
+    - step: gather
+      description: Extract the dependency change from the diff (package name, old version, new version, ecosystem)
+    - step: dispatch
+      mode: parallel
+      description: Run version-diff, vuln-lookup, and usage-impact subagents in parallel
+      subagents:
+        - version-diff
+        - vuln-lookup
+        - usage-impact
+    - step: dispatch-sequential
+      description: Run fix-verify (needs version-diff + usage-impact output), then risk-rank (needs all four)
+      subagents:
+        - fix-verify
+        - risk-rank
+    - step: merge
+      description: Reconcile all five subagent outputs into a single risk-tiered verdict
+    - step: report
+      description: Format the verdict as a PR review comment with suggested patch
+    - step: confirm
+      description: Present the verdict and proposed patch for developer confirmation
+    - step: push
+      description: On confirmation, apply patch, run tests, and push if tests pass

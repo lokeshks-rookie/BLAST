@@ -29,8 +29,8 @@ See `README.md` for the architecture diagram and `Project_context.md` for the fu
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Repository & Environment Scaffolding | 🔄 In Progress |
-| 2 | Bob Custom Mode, Skills & Rules Authoring | ⬜ Pending |
+| 1 | Repository & Environment Scaffolding | ✅ Complete |
+| 2 | Bob Custom Mode, Skills & Rules Authoring | ✅ Complete |
 | 3 | Shared Data Contracts & Local Test Fixtures | ⬜ Pending |
 | 4 | Orchestrator / Merge & Report Engine | ⬜ Pending |
 | 5 | GitHub Action / Webhook Wrapper | ⬜ Pending |
