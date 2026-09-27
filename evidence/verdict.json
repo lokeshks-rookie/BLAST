@@ -1,0 +1,49 @@
+{
+  "package_name": "axios",
+  "old_version": "1.4.0",
+  "new_version": "1.7.2",
+  "ecosystem": "npm",
+  "risk_tier": "merge-with-patch",
+  "confidence": 0.87,
+  "summary": "Bumping axios 1.4.0 \u2192 1.7.2 closes a high-severity CSRF vulnerability (CVE-2023-45857) and introduces one breaking change to the auth config format. The breaking change affects 2 call sites, 1 of which is reachable from untrusted input (the /login endpoint). A mechanical fix is available. Recommend merging with the attached patch applied.",
+  "findings": [
+    {
+      "finding_type": "cve_closed",
+      "severity": "info",
+      "title": "CVE-2023-45857 resolved",
+      "description": "Axios Cross-Site Request Forgery vulnerability due to XSRF-TOKEN cookie exposure in cross-site requests. (Fixed in 1.6.1).",
+      "references": [
+        "CVE-2023-45857",
+        "GHSA-wf5p-g6vw-rhxx"
+      ],
+      "reachable_call_sites": 0,
+      "total_call_sites": 0
+    },
+    {
+      "finding_type": "breaking_change_fixable",
+      "severity": "medium",
+      "title": "BC-001: axios.create({ auth }) (Patch available)",
+      "description": "The 'auth' config option no longer accepts a plain string. It now requires an object with 'username' and 'password' fields. Found 2 call site(s) (1 reachable). Mechanical patch provided.",
+      "references": [
+        "BC-001"
+      ],
+      "reachable_call_sites": 1,
+      "total_call_sites": 2
+    }
+  ],
+  "reasoning_chain": [
+    "Vulnerability CVE-2023-45857 (high severity) is resolved by 1.7.2.",
+    "Breaking change BC-001 affects 2 call site(s). Mechanical patch is available."
+  ],
+  "recommended_action": "Apply the attached patch, run verification tests, then merge.",
+  "has_patch": true,
+  "patch": "--- a/src/api/client.js\n+++ b/src/api/client.js\n@@ -40,3 +40,3 @@\n function createAuthenticatedClient(credentials) {\n-  const client = axios.create({ auth: credentials });\n+  const client = axios.create({ auth: { username: credentials.split(':')[0], password: credentials.split(':')[1] } });\n   return client;\n",
+  "files_modified": [
+    "src/api/client.js"
+  ],
+  "test_commands": [
+    "npm run test:integration",
+    "npm test"
+  ],
+  "markdown_comment": "## ![Merge With Patch](https://img.shields.io/badge/Blast%20Radius-MERGE%20WITH%20PATCH-orange)\n\n**Package:** `axios` | **Delta:** `1.4.0` \u2192 `1.7.2` (`npm`)\n**Risk Tier:** `MERGE-WITH-PATCH` | **Confidence:** `87%`\n\n### Verdict Summary\nBumping axios 1.4.0 \u2192 1.7.2 closes a high-severity CSRF vulnerability (CVE-2023-45857) and introduces one breaking change to the auth config format. The breaking change affects 2 call sites, 1 of which is reachable from untrusted input (the /login endpoint). A mechanical fix is available. Recommend merging with the attached patch applied.\n\n### Evidence & Findings\n| Severity | Finding | Reachability | References |\n|:---|:---|:---|:---|\n| \u2139\ufe0f Info | **CVE-2023-45857 resolved**<br>Axios Cross-Site Request Forgery vulnerability due to XSRF-TOKEN cookie exposure in cross-site requests. (Fixed in 1.6.1). | N/A | `CVE-2023-45857`, `GHSA-wf5p-g6vw-rhxx` |\n| \ud83d\udfe1 Medium | **BC-001: axios.create({ auth }) (Patch available)**<br>The 'auth' config option no longer accepts a plain string. It now requires an object with 'username' and 'password' fields. Found 2 call site(s) (1 reachable). Mechanical patch provided. | 1/2 call sites | `BC-001` |\n\n### Reasoning Chain\n- Vulnerability CVE-2023-45857 (high severity) is resolved by 1.7.2.\n- Breaking change BC-001 affects 2 call site(s). Mechanical patch is available.\n\n### Recommended Action\n> Apply the attached patch, run verification tests, then merge.\n\n### Suggested Patch (Unified Diff)\n```diff\n--- a/src/api/client.js\n+++ b/src/api/client.js\n@@ -40,3 +40,3 @@\n function createAuthenticatedClient(credentials) {\n-  const client = axios.create({ auth: credentials });\n+  const client = axios.create({ auth: { username: credentials.split(':')[0], password: credentials.split(':')[1] } });\n   return client;\n```\n\n**Verification commands to run after applying:**\n```bash\nnpm run test:integration\nnpm test\n```\n\n---\n*Generated automatically by **Blast Radius** \u2014 Evidence-Grounded Dependency Reviewer.*"
+}
