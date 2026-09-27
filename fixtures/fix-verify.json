@@ -1,0 +1,25 @@
+{
+  "package_name": "axios",
+  "new_version": "1.7.2",
+  "ecosystem": "npm",
+  "patches": [
+    {
+      "breaking_change_id": "BC-001",
+      "affected_api": "axios.create({ auth })",
+      "patch_type": "mechanical_fix",
+      "description": "Migrate auth config from string format to object format with username and password fields.",
+      "diff": "--- a/src/api/client.js\n+++ b/src/api/client.js\n@@ -40,3 +40,3 @@\n function createAuthenticatedClient(credentials) {\n-  const client = axios.create({ auth: credentials });\n+  const client = axios.create({ auth: { username: credentials.split(':')[0], password: credentials.split(':')[1] } });\n   return client;\n",
+      "files_modified": [
+        "src/api/client.js"
+      ],
+      "manual_review_reason": null,
+      "test_commands": [
+        "npm test",
+        "npm run test:integration"
+      ]
+    }
+  ],
+  "total_mechanical_fixes": 1,
+  "total_manual_review": 0,
+  "summary": "1 mechanical fix proposed for the auth config format change (BC-001) affecting src/api/client.js. The patch converts the string-form auth to the required object form. Run 'npm test' after applying to verify."
+}

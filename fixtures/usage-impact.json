@@ -1,0 +1,33 @@
+{
+  "package_name": "axios",
+  "ecosystem": "npm",
+  "repo_path": "fixtures/demo-repo",
+  "impact_results": [
+    {
+      "breaking_change_id": "BC-001",
+      "affected_api": "axios.create({ auth })",
+      "call_site_count": 2,
+      "call_sites": [
+        {
+          "file": "src/api/client.js",
+          "line": 42,
+          "column": 5,
+          "function_context": "createAuthenticatedClient",
+          "code_snippet": "const client = axios.create({ auth: credentials });",
+          "reachable_from_untrusted_input": true,
+          "reachability_reasoning": "Called from the /login endpoint handler, which receives credentials from the HTTP request body."
+        },
+        {
+          "file": "scripts/seed-data.js",
+          "line": 15,
+          "column": 3,
+          "function_context": "seedDatabase",
+          "code_snippet": "const admin = axios.create({ auth: ADMIN_CREDS });",
+          "reachable_from_untrusted_input": false,
+          "reachability_reasoning": "Only called from a local CLI seed script, not reachable from any HTTP handler or user input path."
+        }
+      ]
+    }
+  ],
+  "summary": "The breaking change to axios.create({ auth }) (BC-001) affects 2 call sites in this repo. One is in the authentication client (src/api/client.js:42) and IS reachable from untrusted input via the /login endpoint. The other is in a local seed script and is not reachable. This breaking change requires migration for at least the production call site."
+}

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UsageImpactOutput",
+  "description": "Output schema for the Usage-Impact subagent",
+  "type": "object",
+  "required": [
+    "package_name",
+    "ecosystem",
+    "repo_path",
+    "impact_results",
+    "summary"
+  ],
+  "properties": {
+    "package_name": {
+      "type": "string"
+    },
+    "ecosystem": {
+      "type": "string",
+      "enum": ["npm", "pypi", "go", "cargo", "rubygems", "docker", "maven"]
+    },
+    "repo_path": {
+      "type": "string"
+    },
+    "impact_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "breaking_change_id",
+          "affected_api",
+          "call_site_count",
+          "call_sites"
+        ],
+        "properties": {
+          "breaking_change_id": {
+            "type": "string"
+          },
+          "affected_api": {
+            "type": "string"
+          },
+          "call_site_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "call_sites": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "file",
+                "line",
+                "column",
+                "function_context",
+                "code_snippet",
+                "reachable_from_untrusted_input",
+                "reachability_reasoning"
+              ],
+              "properties": {
+                "file": {
+                  "type": "string"
+                },
+                "line": {
+                  "type": "integer"
+                },
+                "column": {
+                  "type": "integer"
+                },
+                "function_context": {
+                  "type": "string"
+                },
+                "code_snippet": {
+                  "type": "string"
+                },
+                "reachable_from_untrusted_input": {
+                  "type": "boolean"
+                },
+                "reachability_reasoning": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

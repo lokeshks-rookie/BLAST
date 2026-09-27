@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VersionDiffOutput",
+  "description": "Output schema for the Version-Diff subagent",
+  "type": "object",
+  "required": [
+    "package_name",
+    "old_version",
+    "new_version",
+    "ecosystem",
+    "breaking_changes",
+    "deprecations",
+    "summary",
+    "source_urls"
+  ],
+  "properties": {
+    "package_name": {
+      "type": "string",
+      "description": "The dependency package name"
+    },
+    "old_version": {
+      "type": "string",
+      "description": "The currently pinned version before bump"
+    },
+    "new_version": {
+      "type": "string",
+      "description": "The target version after bump"
+    },
+    "ecosystem": {
+      "type": "string",
+      "enum": ["npm", "pypi", "go", "cargo", "rubygems", "docker", "maven"]
+    },
+    "breaking_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "change_type",
+          "affected_api",
+          "migration_notes",
+          "version_introduced"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "change_type": {
+            "type": "string",
+            "enum": [
+              "api_rename",
+              "api_removal",
+              "signature_change",
+              "default_change",
+              "behavior_change",
+              "import_relocation"
+            ]
+          },
+          "affected_api": {
+            "type": "string"
+          },
+          "old_signature": {
+            "type": ["string", "null"]
+          },
+          "new_signature": {
+            "type": ["string", "null"]
+          },
+          "migration_notes": {
+            "type": "string"
+          },
+          "version_introduced": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "deprecations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["affected_api", "description"],
+        "properties": {
+          "affected_api": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "removal_version": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "source_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

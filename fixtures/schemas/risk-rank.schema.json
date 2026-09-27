@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RiskRankOutput",
+  "description": "Output schema for the Risk-Ranking subagent",
+  "type": "object",
+  "required": [
+    "package_name",
+    "old_version",
+    "new_version",
+    "ecosystem",
+    "risk_tier",
+    "confidence",
+    "summary",
+    "findings",
+    "reasoning_chain",
+    "recommended_action",
+    "has_patch"
+  ],
+  "properties": {
+    "package_name": {
+      "type": "string"
+    },
+    "old_version": {
+      "type": "string"
+    },
+    "new_version": {
+      "type": "string"
+    },
+    "ecosystem": {
+      "type": "string",
+      "enum": ["npm", "pypi", "go", "cargo", "rubygems", "docker", "maven"]
+    },
+    "risk_tier": {
+      "type": "string",
+      "enum": ["safe", "merge-with-patch", "do-not-merge"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "summary": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "finding_type",
+          "severity",
+          "title",
+          "description",
+          "references",
+          "reachable_call_sites",
+          "total_call_sites"
+        ],
+        "properties": {
+          "finding_type": {
+            "type": "string",
+            "enum": [
+              "cve_reachable",
+              "cve_unreachable",
+              "breaking_change_fixable",
+              "breaking_change_manual",
+              "breaking_change_no_impact",
+              "cve_closed"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "info"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reachable_call_sites": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_call_sites": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "reasoning_chain": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_action": {
+      "type": "string"
+    },
+    "has_patch": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

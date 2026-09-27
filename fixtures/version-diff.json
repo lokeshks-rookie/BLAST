@@ -1,0 +1,30 @@
+{
+  "package_name": "axios",
+  "old_version": "1.4.0",
+  "new_version": "1.7.2",
+  "ecosystem": "npm",
+  "breaking_changes": [
+    {
+      "id": "BC-001",
+      "description": "The 'auth' config option no longer accepts a plain string. It now requires an object with 'username' and 'password' fields.",
+      "change_type": "signature_change",
+      "affected_api": "axios.create({ auth })",
+      "old_signature": "auth: 'user:pass'",
+      "new_signature": "auth: { username: 'user', password: 'pass' }",
+      "migration_notes": "Replace any string-form auth config with the object form: { username, password }.",
+      "version_introduced": "1.6.0"
+    }
+  ],
+  "deprecations": [
+    {
+      "affected_api": "axios.defaults.transformRequest",
+      "description": "Direct mutation of defaults.transformRequest is deprecated. Use axios.create() with a custom transformRequest instead.",
+      "removal_version": "2.0.0"
+    }
+  ],
+  "summary": "The axios 1.4.0 → 1.7.2 delta includes one breaking change to the auth config format (now requires an object instead of a string) introduced in 1.6.0, and one deprecation of direct defaults mutation planned for removal in 2.0.0.",
+  "source_urls": [
+    "https://github.com/axios/axios/releases/tag/v1.6.0",
+    "https://github.com/axios/axios/blob/main/CHANGELOG.md"
+  ]
+}

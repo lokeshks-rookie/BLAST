@@ -1,0 +1,43 @@
+{
+  "package_name": "axios",
+  "old_version": "1.4.0",
+  "new_version": "1.7.2",
+  "ecosystem": "npm",
+  "risk_tier": "merge-with-patch",
+  "confidence": 0.87,
+  "summary": "Bumping axios 1.4.0 → 1.7.2 closes a high-severity CSRF vulnerability (CVE-2023-45857) and introduces one breaking change to the auth config format. The breaking change affects 2 call sites, 1 of which is reachable from untrusted input (the /login endpoint). A mechanical fix is available. Recommend merging with the attached patch applied.",
+  "findings": [
+    {
+      "finding_type": "cve_closed",
+      "severity": "info",
+      "title": "CVE-2023-45857 closed by this bump",
+      "description": "CSRF vulnerability via XSRF-TOKEN cookie exposure is fixed in axios >=1.6.1. This bump to 1.7.2 resolves it.",
+      "references": [
+        "CVE-2023-45857",
+        "GHSA-wf5p-g6vw-rhxx"
+      ],
+      "reachable_call_sites": 0,
+      "total_call_sites": 0
+    },
+    {
+      "finding_type": "breaking_change_fixable",
+      "severity": "medium",
+      "title": "Auth config format change (BC-001) — mechanical fix available",
+      "description": "The auth config option now requires an object instead of a string. 2 call sites found, 1 reachable from untrusted input. A mechanical patch is available to migrate both call sites.",
+      "references": [
+        "BC-001"
+      ],
+      "reachable_call_sites": 1,
+      "total_call_sites": 2
+    }
+  ],
+  "reasoning_chain": [
+    "1. CVE-2023-45857 (high severity) is CLOSED by this bump — positive signal, reduces risk.",
+    "2. No new CVEs are introduced — no negative CVE signal.",
+    "3. Breaking change BC-001 affects 2 call sites. 1 is reachable from untrusted input (/login handler).",
+    "4. Fix-verify provides a mechanical patch for BC-001 — risk is mitigable without manual review.",
+    "5. Combined: net positive (CVE closed) with one manageable breaking change. Tier: merge-with-patch."
+  ],
+  "recommended_action": "Apply the attached patch for BC-001, then run 'npm test' to verify. Once tests pass, this bump is safe to merge.",
+  "has_patch": true
+}

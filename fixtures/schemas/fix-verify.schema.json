@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FixVerifyOutput",
+  "description": "Output schema for the Fix-Verify subagent",
+  "type": "object",
+  "required": [
+    "package_name",
+    "new_version",
+    "ecosystem",
+    "patches",
+    "total_mechanical_fixes",
+    "total_manual_review",
+    "summary"
+  ],
+  "properties": {
+    "package_name": {
+      "type": "string"
+    },
+    "new_version": {
+      "type": "string"
+    },
+    "ecosystem": {
+      "type": "string",
+      "enum": ["npm", "pypi", "go", "cargo", "rubygems", "docker", "maven"]
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "breaking_change_id",
+          "affected_api",
+          "patch_type",
+          "description",
+          "files_modified",
+          "test_commands"
+        ],
+        "properties": {
+          "breaking_change_id": {
+            "type": "string"
+          },
+          "affected_api": {
+            "type": "string"
+          },
+          "patch_type": {
+            "type": "string",
+            "enum": ["mechanical_fix", "manual_review_required"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "diff": {
+            "type": ["string", "null"]
+          },
+          "files_modified": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "manual_review_reason": {
+            "type": ["string", "null"]
+          },
+          "test_commands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "total_mechanical_fixes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "total_manual_review": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VulnLookupOutput",
+  "description": "Output schema for the Vulnerability Lookup subagent",
+  "type": "object",
+  "required": [
+    "package_name",
+    "old_version",
+    "new_version",
+    "ecosystem",
+    "cves_closed",
+    "cves_introduced",
+    "cves_unresolved",
+    "summary",
+    "query_timestamp"
+  ],
+  "properties": {
+    "package_name": {
+      "type": "string"
+    },
+    "old_version": {
+      "type": "string"
+    },
+    "new_version": {
+      "type": "string"
+    },
+    "ecosystem": {
+      "type": "string",
+      "enum": ["npm", "pypi", "go", "cargo", "rubygems", "docker", "maven"]
+    },
+    "cves_closed": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cve_entry"
+      }
+    },
+    "cves_introduced": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cve_entry"
+      }
+    },
+    "cves_unresolved": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/cve_entry"
+      }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "query_timestamp": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "cve_entry": {
+      "type": "object",
+      "required": [
+        "cve_id",
+        "summary",
+        "severity",
+        "affected_range",
+        "fixed_in",
+        "advisory_url"
+      ],
+      "properties": {
+        "cve_id": {
+          "type": "string"
+        },
+        "ghsa_id": {
+          "type": ["string", "null"]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"]
+        },
+        "cvss_score": {
+          "type": ["number", "null"]
+        },
+        "affected_range": {
+          "type": "string"
+        },
+        "fixed_in": {
+          "type": "string"
+        },
+        "advisory_url": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
