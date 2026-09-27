@@ -36,7 +36,7 @@ See `README.md` for the architecture diagram and `Project_context.md` for the fu
 | 5 | GitHub Action / Webhook Wrapper | ✅ Complete |
 | 6 | Fix-Verify Auto-Patch & Test-Rerun Harness | ✅ Complete |
 | 7 | Voice Layer: Bhashini STT/TTS Bridge | ✅ Complete |
-| 8 | Auto Git-Push Logic & Risk-Aware Commit Messages | ⬜ Pending |
+| 8 | Auto Git-Push Logic & Risk-Aware Commit Messages | ✅ Complete |
 | 9 | Evidence, Bob Sessions & Documentation Scaffolding | ⬜ Pending |
 | 10 | First Live Bob Integration Run | ⬜ Pending |
 | 11 | Full Pipeline Integration Test & Rehearsal | ⬜ Pending |
