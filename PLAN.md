@@ -37,7 +37,7 @@ See `README.md` for the architecture diagram and `Project_context.md` for the fu
 | 6 | Fix-Verify Auto-Patch & Test-Rerun Harness | ✅ Complete |
 | 7 | Voice Layer: Bhashini STT/TTS Bridge | ✅ Complete |
 | 8 | Auto Git-Push Logic & Risk-Aware Commit Messages | ✅ Complete |
-| 9 | Evidence, Bob Sessions & Documentation Scaffolding | ⬜ Pending |
+| 9 | Evidence, Bob Sessions & Documentation Scaffolding | ✅ Complete |
 | 10 | First Live Bob Integration Run | ⬜ Pending |
 | 11 | Full Pipeline Integration Test & Rehearsal | ⬜ Pending |
 | 12 | Final Verification & Submission Packaging | ⬜ Pending |

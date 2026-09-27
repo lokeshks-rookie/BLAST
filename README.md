@@ -8,77 +8,136 @@
 
 ## Problem
 
-Dependency and configuration manifest changes (version bumps in `package.json`, `requirements.txt`, `go.mod`, `Dockerfile` base image tags, CI pipeline YAMLs) look trivial but carry high blast radius. Reviewing them properly requires:
+Dependency and configuration manifest changes — version bumps in `package.json`,
+`requirements.txt`, `go.mod`, `Dockerfile` base image tags, CI pipeline YAMLs —
+look trivial in a PR but carry **high blast radius**. Reviewing them properly requires:
 
 1. Reading changelogs for breaking API changes
 2. Cross-referencing against vulnerability databases (CVEs closed/introduced)
 3. Checking whether changed API surfaces are actually called in the codebase
+4. Proposing and verifying a mechanical fix if one exists
+5. Generating a risk-tier verdict the reviewer can act on in under 30 seconds
 
-This takes 15–20 minutes per bump done properly. Teams approve on trust instead of evidence.
+This takes **15–20 minutes per bump** done properly. Teams approve on trust
+instead of evidence, and vulnerabilities slip through.
+
+---
 
 ## Solution
 
-**Blast Radius** is a custom IBM Bob 2.0 mode that triggers on manifest diffs and produces a single **risk-tiered, evidence-backed verdict** per change.
+**Blast Radius** is a custom IBM Bob 2.0 mode that triggers automatically on
+manifest diffs and produces a single **risk-tiered, evidence-backed verdict**
+per change — delivered as a PR comment, spoken aloud via voice, and gated
+by an explicit developer confirmation before any patch is applied or pushed.
 
-### Architecture
+---
+
+## Architecture
 
 ```
                          ┌─────────────────────────┐
    PR opened / updated → │  GitHub webhook trigger  │
-   (manifest file touched)└───────────┬─────────────┘
-                                       ▼
+   (manifest touched)    └───────────┬─────────────┘
+                                      ▼
                          ┌─────────────────────────┐
                          │   Bob Orchestrator Mode   │
-                         │   (.bob/custom_modes.yaml)│
+                         │  (.bob/custom_modes.yaml) │
                          └───────────┬─────────────┘
-                                       │  dispatches in parallel
+                                      │  5 subagents dispatched in parallel
         ┌──────────────┬──────────────┼──────────────┬──────────────┐
         ▼              ▼              ▼              ▼              ▼
   Version-Diff   Vulnerability   Usage-Impact    Fix-Verify     Risk-Ranking
    Subagent        Subagent        Subagent       Subagent       Subagent
-  (changelog)    (OSV/GHSA)     (call sites)    (patch+test)   (watsonx.ai)
+  (changelog)    (OSV/GHSA)     (call sites)  (patch + test)  (watsonx.ai)
         └──────────────┴──────────────┼──────────────┴──────────────┘
-                                       ▼
+                                      ▼
                          ┌─────────────────────────┐
-                         │   Merge & Report Step     │
+                         │   orchestrator/merge.py   │
                          │  risk-tiered verdict +    │
-                         │  suggested patch           │
+                         │  evidence + suggested fix │
                          └───────────┬─────────────┘
-                                       ▼
-                         ┌─────────────────────────┐
-                         │  Posted as a live PR      │
-                         │  review comment + voice   │
-                         └─────────────────────────┘
+                          ┌──────────┼──────────┐
+                          ▼          ▼          ▼
+                     PR Comment  Voice TTS   Auto-Push
+                     (GitHub)   (Bhashini) (git + banner)
 ```
 
-## Before/After Metric
+### Voice Layer
+
+Mic input → **Bhashini STT** → text → Bob Shell (non-interactive) →
+Bob output → **Bhashini TTS** → spoken back.
+
+Four use cases: risk verdict spoken aloud, voice confirmation of patch
+application, periodic progress updates, and spoken intent checks for long runs.
+Multilingual — developers can dictate in regional Indian languages.
+
+---
+
+## Before / After
 
 | | Manual Review | Blast Radius |
 |---|---|---|
-| Time per bump | ~15–20 min | *TBD (Phase 11)* |
+| Time per bump | ~15–20 min | **< 60 s** *(Phase 11 rehearsal result — TBD)* |
 | Evidence quality | Trust-based | CVE + changelog + call-site grounded |
+| Confirmation mode | Review + click | Voice ("confirm") or CLI, your choice |
+| Commit message | Generic ("bump axios") | Risk-aware ("fix: patch axios 1.4→1.7, closes CVE-2023-45857") |
+
+---
 
 ## Demo Video
 
-*Link TBD*
+*Link TBD — to be added after Phase 11 rehearsal*
 
 ---
 
 ## Repository Structure
 
 ```
-.bob/                    # Bob 2.0 configuration
-  custom_modes.yaml      # Blast Radius mode definition
-  skills/                # 5 subagent skill definitions
-  rules-blast-radius/    # Orchestration rules
-voice/                   # Bhashini STT/TTS bridge
-orchestrator/            # Merge & report engine
-.github/workflows/       # GitHub Action for live PR integration
-tests/                   # Unit and integration tests
-fixtures/                # Mock data & JSON schemas
-evidence/                # Bob task-session evidence
-bob_sessions/            # Required deliverable — session summaries
+.bob/
+  custom_modes.yaml          # Blast Radius mode definition
+  skills/                    # 5 subagent skill files (version-diff, vuln-lookup,
+  │  version-diff/           #   usage-impact, fix-verify, risk-rank)
+  │  vuln-lookup/
+  │  usage-impact/
+  │  fix-verify/
+  │  risk-rank/
+  rules-blast-radius/        # Orchestration rules (propose-confirm-execute, push gating)
+
+orchestrator/
+  merge.py                   # Reconciles 5 subagent outputs → risk-tier verdict
+  post_comment.py            # Posts verdict as GitHub PR comment (idempotent)
+  fix_verify.py              # Confirm → scratch branch → apply patch → rerun tests
+  auto_push.py               # Risk-aware commit message + branch/repo banner + push gate
+
+voice/
+  bridge.py                  # Bhashini STT/TTS bridge (all 4 voice use cases)
+
+.github/workflows/
+  blast-radius.yml           # GitHub Action: PR webhook → Bob → comment
+
+fixtures/
+  schemas/                   # JSON Schemas for all 5 subagent contracts
+  *.json                     # Mock fixtures (demo case: axios 1.4.0 → 1.7.2, CVE-2023-45857)
+  demo-repo/                 # Target demo app for fix-verify test rerun
+
+evidence/
+  version-diff/              # Real subagent run output (populated in Phase 10)
+  vuln-lookup/
+  usage-impact/
+  fix-verify/
+  risk-rank/
+  verdict.json               # Orchestrator merged verdict
+  verdict.md                 # Human-readable verdict
+
+bob_sessions/
+  lokesh/                    # Bob task-session screenshots (required deliverable)
+  teammate/
+
+tests/                       # 70 unit tests — all passing
+SUBMISSION.md                # Standalone written deliverables for judges
 ```
+
+---
 
 ## Setup
 
@@ -87,5 +146,38 @@ python -m venv .venv
 source .venv/bin/activate     # Linux/Mac
 .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-cp .env.example .env          # Fill in your credentials
+cp .env.example .env          # Fill in: BHASHINI_API_KEY, GITHUB_TOKEN, etc.
 ```
+
+### Run all tests
+
+```bash
+pytest -v
+# Expected: 70 passed
+```
+
+### Run the orchestrator against mock fixtures
+
+```bash
+python orchestrator/merge.py --fixtures fixtures/ --output evidence/verdict.json
+```
+
+### Test the voice bridge (dry run — no credentials needed)
+
+```bash
+python voice/bridge.py --mode roundtrip --dry-run
+```
+
+### Preview the push banner and risk-aware commit message
+
+```bash
+python orchestrator/auto_push.py --mode banner
+python orchestrator/auto_push.py --mode commit-msg
+```
+
+---
+
+## Judges — Start Here
+
+See [`SUBMISSION.md`](SUBMISSION.md) for the two required written deliverables:
+the problem/solution statement and the statement on how IBM Bob 2.0 was used.
