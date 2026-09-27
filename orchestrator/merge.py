@@ -348,11 +348,27 @@ def render_markdown_comment(verdict: dict) -> str:
 
 
 def load_fixtures_from_dir(fixtures_dir: Path) -> Tuple[dict, dict, dict, dict, Optional[dict]]:
-    """Load the 5 subagent output JSONs from a directory."""
+    """Load the 5 subagent output JSONs from a directory or evidence subfolders."""
+    def find_subagent_file(name: str) -> Optional[Path]:
+        # 1. Flat file: dir/name.json
+        direct_path = fixtures_dir / f"{name}.json"
+        if direct_path.is_file():
+            return direct_path
+        # 2. Subfolder: dir/name/name.json or first .json in dir/name/
+        subfolder = fixtures_dir / name
+        if subfolder.is_dir():
+            exact_sub = subfolder / f"{name}.json"
+            if exact_sub.is_file():
+                return exact_sub
+            json_candidates = [p for p in subfolder.glob("*.json") if p.name != "validation_report.json"]
+            if json_candidates:
+                return sorted(json_candidates)[0]
+        return None
+
     def load_json(name: str) -> dict:
-        path = fixtures_dir / f"{name}.json"
-        if not path.is_file():
-            raise MergeEngineError(f"Required subagent fixture missing: {path}")
+        path = find_subagent_file(name)
+        if not path:
+            raise MergeEngineError(f"Required subagent output missing for '{name}' in {fixtures_dir}")
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
@@ -362,9 +378,9 @@ def load_fixtures_from_dir(fixtures_dir: Path) -> Tuple[dict, dict, dict, dict, 
     fv = load_json("fix-verify")
 
     rr = None
-    rr_path = fixtures_dir / "risk-rank.json"
-    if rr_path.is_file():
-        with open(rr_path, "r", encoding="utf-8") as f:
+    rr_file = find_subagent_file("risk-rank")
+    if rr_file:
+        with open(rr_file, "r", encoding="utf-8") as f:
             rr = json.load(f)
 
     return vd, vl, ui, fv, rr
