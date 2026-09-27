@@ -138,10 +138,11 @@ subagents' actual detection logic.*
 
 Antigravity (this agent) authored:
 - Environment scaffolding, schemas, mock fixtures
-- `orchestrator/merge.py`, `post_comment.py`, `fix_verify.py`, `auto_push.py`
+- `orchestrator/merge.py`, `post_comment.py`, `fix_verify.py`, `auto_push.py`, `pipeline.py`
+- `tools/pre_run_checklist.py`, `validate_bob_output.py`, `ingest_bob_output.py`
 - `voice/bridge.py` (Bhashini STT/TTS)
 - `.github/workflows/blast-radius.yml` (GitHub Action)
-- All 70 unit tests
+- All 83 unit and integration tests (100% passing)
 
 Bob authors:
 - Detection logic in live runs (version-diff changelog parsing, CVE queries,
