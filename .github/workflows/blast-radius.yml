@@ -1,0 +1,82 @@
+name: Blast Radius Reviewer
+
+"on":
+  pull_request:
+    paths:
+      - "package.json"
+      - "package-lock.json"
+      - "yarn.lock"
+      - "pnpm-lock.yaml"
+      - "requirements.txt"
+      - "Pipfile"
+      - "Pipfile.lock"
+      - "pyproject.toml"
+      - "poetry.lock"
+      - "go.mod"
+      - "go.sum"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "Gemfile"
+      - "Gemfile.lock"
+      - "composer.json"
+      - "composer.lock"
+      - "Dockerfile"
+      - "Dockerfile.*"
+      - "docker-compose.yml"
+      - "docker-compose.yaml"
+      - ".github/workflows/*.yml"
+      - ".github/workflows/*.yaml"
+      - ".gitlab-ci.yml"
+      - "Jenkinsfile"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  blast-radius-review:
+    name: Blast Radius Dependency Risk Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Invoke Bob Shell (Placeholder for Phase 10)
+        id: bob-shell
+        run: |
+          echo "=========================================================="
+          echo "  IBM Bob 2.0 Agentic Dispatch (Blast Radius Mode)        "
+          echo "=========================================================="
+          # In Phase 10, this executes:
+          # bob-shell --mode blast-radius --diff "$(git diff origin/main...HEAD)"
+          echo "Running mock subagent pipeline in fixture test harness..."
+
+      - name: Run Blast Radius Orchestrator Merge Engine
+        run: |
+          python orchestrator/merge.py --fixtures-dir fixtures
+
+      - name: Post Verdict as PR Review Comment
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python orchestrator/post_comment.py \
+            --repo "${{ github.repository }}" \
+            --pr-number "${{ github.event.pull_request.number }}" \
+            --comment-file "evidence/verdict.md"
