@@ -34,8 +34,8 @@ See `README.md` for the architecture diagram and `Project_context.md` for the fu
 | 3 | Shared Data Contracts & Local Test Fixtures | ✅ Complete |
 | 4 | Orchestrator / Merge & Report Engine | ✅ Complete |
 | 5 | GitHub Action / Webhook Wrapper | ✅ Complete |
-| 6 | Fix-Verify Auto-Patch & Test-Rerun Harness | ⬜ Pending |
-| 7 | Voice Layer: Bhashini STT/TTS Bridge | ⬜ Pending |
+| 6 | Fix-Verify Auto-Patch & Test-Rerun Harness | ✅ Complete |
+| 7 | Voice Layer: Bhashini STT/TTS Bridge | ✅ Complete |
 | 8 | Auto Git-Push Logic & Risk-Aware Commit Messages | ⬜ Pending |
 | 9 | Evidence, Bob Sessions & Documentation Scaffolding | ⬜ Pending |
 | 10 | First Live Bob Integration Run | ⬜ Pending |
